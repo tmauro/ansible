@@ -1,0 +1,12 @@
+---
+# handlers file for apache2
+
+- name: restart apache2
+  service:
+    name: "{{ apache2_service }}"
+    state: restarted
+
+- name: reload apache2
+  service:
+    name: "{{ apache2_service }}"
+    state: reloaded

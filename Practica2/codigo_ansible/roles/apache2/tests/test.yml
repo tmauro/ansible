@@ -1,0 +1,92 @@
+---
+
+- name: Bring up docker containers
+  hosts: localhost
+  gather_facts: false
+  vars:
+    inventory:
+      - name: apache2_centos7
+        image: "xeridia/centos7"
+      - name: apache2_debian8
+        image: "xeridia/debian8"
+  roles:
+    - { role: docker_dynamic_inventory_provisioner, docker_dynamic_inventory_provisioner_inventory: "{{inventory}}", docker_dynamic_inventory_provisioner_restart_containers_on_startup: no }
+
+- hosts: docker_containers
+  remote_user: root
+  vars:
+    certs:
+      - filename: xeridia.local
+        crt: |
+          -----BEGIN CERTIFICATE-----
+          MIIDuzCCAqOgAwIBAgIJAKiTAJSXBmVCMA0GCSqGSIb3DQEBCwUAMHQxCzAJBgNV
+          BAYTAkVTMQ0wCwYDVQQIDARMZW9uMQ0wCwYDVQQHDARMZW9uMRAwDgYDVQQKDAdY
+          ZXJpZGlhMRAwDgYDVQQDDAdjZW50b3M3MSMwIQYJKoZIhvcNAQkBFhRzaXN0ZW1h
+          c0B4ZXJpZGlhLmNvbTAeFw0xNjEyMTQxNjA0MjVaFw0yNjEyMTIxNjA0MjVaMHQx
+          CzAJBgNVBAYTAkVTMQ0wCwYDVQQIDARMZW9uMQ0wCwYDVQQHDARMZW9uMRAwDgYD
+          VQQKDAdYZXJpZGlhMRAwDgYDVQQDDAdjZW50b3M3MSMwIQYJKoZIhvcNAQkBFhRz
+          aXN0ZW1hc0B4ZXJpZGlhLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+          ggEBAKygy0/N7TnwmG+7I7YYzlvto26osvw51U55dR2v6z6ePKTymwDMRmutcBdx
+          CRXoWbgOU9QG/TZXQGAyac4Kub4ohEVvwOtQxR4ArGlSXckBd9yuphXVp0dwRmuZ
+          +KNRMTm2yd5T4EpXxypfww8tB3t7AeAG1DmUzA/GAllDdSLZn33vb5rfDIfQjDoE
+          hAg4EQo1JUGGzlhnT8FFGAhUFU6YC4uHX8vDTjJlznmG0MHd9RtPJCMBjiBGi4rH
+          TpR1OIhCkfb7VjzpCuayLiaoNnZuSOb/icWaLMXCIi3lJ7X+I/ODwmp/MAinBZh1
+          4U8iexMCSm9gN8z+4yxj7uMCLN8CAwEAAaNQME4wHQYDVR0OBBYEFCuu0YCn28gU
+          DhnRNnWE4kAgyv48MB8GA1UdIwQYMBaAFCuu0YCn28gUDhnRNnWE4kAgyv48MAwG
+          A1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAI0hAwKy2Zy76phHyeVT/LbR
+          51HZD2PLczd5vBjHSaFrkthcQ2L5SYUG0qI4G+z+3Z+dvja2c3ISo0vpPuQiT/Lq
+          ixRidSDpmoCLAUeBz1MFWCN0ibSvna+gm1VxdwnNT3jpIXBboPAcaIeWyKlBua5P
+          AF2oVwC8MHU/RFNtFJjekGRpDAom2hCTs29Nz3dTHJYSoU+6gaE9BSceIX4S1lYR
+          ZAyYzgrRziLoUf//0f9hk79ZO3Jd5bSeM2iDdw+sdWyap+Z7RjJJYl2Soy/vGkRN
+          YuEbtaQ/uxC0gjq8BtpOQEqmzZcupAYmG6zRnqVVAiP/KK+IP2M7tCheueLaoLo=
+          -----END CERTIFICATE-----
+      - filename: xeridia.local
+        crt: |
+          -----BEGIN PRIVATE KEY-----
+          MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCsoMtPze058Jhv
+          uyO2GM5b7aNuqLL8OdVOeXUdr+s+njyk8psAzEZrrXAXcQkV6Fm4DlPUBv02V0Bg
+          MmnOCrm+KIRFb8DrUMUeAKxpUl3JAXfcrqYV1adHcEZrmfijUTE5tsneU+BKV8cq
+          X8MPLQd7ewHgBtQ5lMwPxgJZQ3Ui2Z9972+a3wyH0Iw6BIQIOBEKNSVBhs5YZ0/B
+          RRgIVBVOmAuLh1/Lw04yZc55htDB3fUbTyQjAY4gRouKx06UdTiIQpH2+1Y86Qrm
+          si4mqDZ2bkjm/4nFmizFwiIt5Se1/iPzg8JqfzAIpwWYdeFPInsTAkpvYDfM/uMs
+          Y+7jAizfAgMBAAECggEAVSq7Q7MX/8bYnf8Y3kUcwjPatsSaEWBDAYVgp3XcPLd6
+          ufJLULh3YbZen+IPlnRclzbSWr/b+wxO4Wbd1l5qRwvcPhmldzMRHP0+EnQlev6z
+          cPflTs5qyg71Xy7GgWSUQaIRtBNzi5oE074NERapI12LjkgwOfxUNM/+5qUmTDt7
+          /ntEBzwP96lZH47NnHOj0QwvDqEIrPYPPRQ+NizlKoY3SEkXtGBBZozUSDiPZoA0
+          iXZ/gIkYy3ATRcdg9lCbCicUE3UmpsvNCpFfWcoDFQ22pQdtUWVDagYQBzvn66LE
+          1SNA9iVFKKiPPN5zqLfw00gwzJpzhdwNhy/uLkwIMQKBgQDd12qjE2lccToL9jU+
+          rUYYqwX+zP8FZz+OFTlxVyQk+z7WYRdpW+x29IdBNk5RiFgenMm/BsgKk3+oDXw1
+          mUxs+yDBJC2FiQGTFaWrV2PZlV4k+vaomGn8e3R64pMlFW4/ebC0k72Ow739OxNX
+          Tnl4t2/9CmfpWdW8urZUCEVAxwKBgQDHNXodMpsi836bfoj+Lo6eMVda4RByxlTA
+          LrS6tmNmiDol/+Sg8FehXy9QDx/D7ucIu+v92Tqis5L/uYqLHabhVaUCN5fjNuvQ
+          6x5HWuQkIhWEzcv5gDUpkudtyUo96vlmGIQvnLv7d5XPwCC7Td4yBRppy+eff/uS
+          x13lOwvLKQKBgQCpBNNOZB/GOs5LBs8SbdoWOVdcBrvWVg/qJOmbHRWAx5vcoiTA
+          NTU4fJ4AZWvOWt8ok7RyQqxuwmpkk8Gq5J2B+uO9w96a+wOkGL4ciXyd7lvIOR1s
+          3pMBtt3MMoyBmI5i9khXjKjD+QbrxPK7diK+gqRkWmVJORTLskXwSEzbSQKBgA2M
+          +7OEv7zO52vYXaU8sYLdRF3wNVg5WYaBJtYUlgphdeMj1v+DmdJmUSeW/8gqNhkH
+          /3OTFUQABx3SFzSDXdiyJLlT4scX806Qz8x2yFIU53XTMe7U48jiL0/ug1hW5YQm
+          YseCV98xMUWighd7ooOwiS1tK2JUKF7BpQd0zsaRAoGAPSZZgUUIbAXcyEMZqpD6
+          llpuRUqAe/ygF12YDxDyedimRuRL1RAI086i/lwZzQ554M5yubRmr8tAICwzLEHV
+          0UpEjV3y5Z5Xt4KpkLZn5pWdUFYZvhsmeSI+uXrdTYGaNS6k7F918yYPSMJy2f1t
+          7UZsSw43XTp0UaAsfs0kW50=
+          -----END PRIVATE KEY-----
+        is_key: True
+    vhosts:
+      - serveradmin: sistemas@xeridia.es
+        is_ssl: True
+    vhosts_ssl:
+      - serveradmin: sistemas@xeridia.es
+        proxy_pass_port: 7990
+        mod_jk_status: true
+        mod_jk_mounts:
+          - { url: "/*", loadbalancer: "lb" }
+        cipher_suite: "ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW"
+        protocol: "all -SSLv2 -SSLv3"
+        certificate_file_path: "xeridia.local"
+        certificate_key_file_path: "xeridia.local"
+    conf_items:
+      - { option: 'EnableMMAP',value: ' on' }
+      - { option: 'EnableSendfile',value: 'off' }
+  roles:
+    - { role: apache2, apache2_remove_default_vhost: True, apache2_create_vhosts: True, apache2_ssl_certificates: "{{certs}}", apache2_vhosts: "{{vhosts}}", apache2_vhosts_ssl: "{{vhosts_ssl}}", apache2_configuration_items: "{{ conf_items }}",
+      apache2_mod_jk_enabled: true, apache2_mod_jk_status_enable: true, apache2_mod_jk_loadbalancers: [ { name: lb, servers: [ { name: server, directives: { host: localhost, port: 8009, type: ajp13 } } ] } ] }

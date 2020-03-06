@@ -1,0 +1,121 @@
+---
+# tasks file for tomcat
+
+- name: Instalar paquete
+  package: name="{{ tomcat_service_name }}-{{ tomcat_version }}" state=present
+  tags: ["install"]
+
+- name: Configurar server.xml
+  template:
+    src: "server.xml.j2"
+    dest: "/etc/{{ tomcat_service_name }}/server.xml"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart tomcat
+  tags: ["config"]
+
+- name: Configurar context.xml
+  template:
+    src: "context.xml.j2"
+    dest: "/etc/{{ tomcat_service_name }}/context.xml"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart tomcat
+  tags: ["config"]
+
+- name: Configuración adicional
+  lineinfile:
+    dest: "/etc/{{ tomcat_service_name }}/catalina.properties"
+    regexp: '^#?\s*{{ item.option }}\s*=.*$'
+    line: '{{ item.option }}={{ item.value }}'
+    state: present
+  with_items: "{{ tomcat_catalina_configs }}"
+  notify:
+    - restart tomcat
+  no_log: yes
+  tags: ["config"]
+
+- name: JARs adicionales actuales (limpieza)
+  find:
+    paths: "{{ tomcat_home }}/lib"
+    patterns: "ansible_managed_*"
+  register: _tomcat_current_additional_jars
+  tags: ["install", "debug"]
+
+- name: JARs adicionales definidos (limpieza)
+  set_fact:
+    _tomcat_additional_jar_filenames: "{{ _tomcat_additional_jar_filenames | default([]) + [ 'ansible_managed_' + (item | basename) ] }}"
+  with_items: "{{ tomcat_additional_jars }}"
+  tags: ["install", "debug"]
+
+- name: JARs adicionales (limpieza)
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ _tomcat_current_additional_jars.files }}"
+  when: (item.path | basename) not in _tomcat_additional_jar_filenames
+  tags: ["install", "debug"]
+
+- name: JARs adicionales
+  copy:
+    src: "{{ item }}"
+    dest: "{{ tomcat_home }}/lib/ansible_managed_{{ item | basename }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  with_items: "{{ tomcat_additional_jars }}"
+  tags: ["install", "debug"]
+
+- name: Configuración entorno Tomcat
+  lineinfile:
+    dest: "/etc/{{ tomcat_service_name }}/tomcat.conf"
+    regexp: '^#?\s*{{ item.option }}\s*=.*$'
+    line: '{{ item.option }}="{{ item.value }}"'
+    state: present
+  with_items: "{{ tomcat_config_base_changes + tomcat_config_changes }}"
+  notify: restart tomcat
+  no_log: yes
+  tags: ["config"]
+
+- name: Configuracion web.xml
+  lineinfile:
+    dest: "/etc/{{ tomcat_service_name }}/web.xml"
+    insertafter: '^#?\s*.{{ item.section }}.*$'
+    regexp: '^#?\s*.{{ item.option }}.*$'
+    line: '<{{ item.option }}>{{ item.value }}</{{ item.option }}>'
+    state: present
+  with_items: "{{ tomcat_config_web }}"
+  notify: restart tomcat
+  no_log: yes
+  tags: ["config"]
+
+- name: Variables de entorno del usuario
+  lineinfile:
+    dest: "/etc/sysconfig/tomcat"
+    regexp: '^#?\s*{{ item.key }}=.*$'
+    line: '{{ item.key }}={{ item.value }}'
+    state: present
+  with_items: "{{ tomcat_env_vars }}"
+  no_log: yes
+  tags: ["config"]
+
+- name: Fichero servicio
+  template:
+    src: tomcat.service.j2
+    dest: /lib/systemd/system/tomcat.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload tomcat
+    - restart tomcat
+  tags: ["install"]
+
+- name: Iniciar y habilitar servicio
+  service:
+    name: "{{ tomcat_service_name }}"
+    state: "started"
+    enabled: "yes"
+  tags: ["install"]

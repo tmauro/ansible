@@ -1,0 +1,188 @@
+---
+# defaults file for apache2
+
+# Complementos de Apache para instalar
+apache2_additional_packages: []
+
+# Interfaz donde escucha el servicio
+apache2_listen_ip: "*"
+# Puerto HTTP
+apache2_listen_port: 80
+# Puerto HTTPS
+apache2_listen_port_ssl: 443
+
+# Modulos Apache extra, en el caso de plataforma Debian
+apache2_debian_mods_enabled:
+  - proxy
+  - proxy_http
+  - proxy_ajp
+  - rewrite
+  - deflate
+  - headers
+  - proxy_balancer
+  - proxy_connect
+  - proxy_html
+  - ssl
+  - xml2enc
+apache2_debian_mods_disabled:
+  - status
+
+# Certificados a instalar
+# Ejemplo de formato
+#apache2_ssl_certificates:
+#  - filename: xeridia.local
+#    crt: |
+#      -----BEGIN CERTIFICATE-----
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      -----END CERTIFICATE-----
+#    crt: |
+#      -----BEGIN CERTIFICATE-----
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      -----END CERTIFICATE-----
+#    is_ca: True
+#  - filename: xeridia.local
+#    crt: |
+#      -----BEGIN CERTIFICATE-----
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      AAAAaAAAaAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAaaaaaaAAaaa
+#      -----END CERTIFICATE-----
+#    is_key: True
+apache2_ssl_certificates: []
+
+# Si se debe desactivar/eliminar la configuración por defecto
+apache2_remove_default_vhost: False
+# Si se debe crear el fichero de Virtual hosts
+apache2_create_vhosts: False
+# Nombre del fichero de Virtual hosts
+apache2_vhosts_filename: vhosts.conf
+# Directivas globales
+apache2_global_vhost_settings: |
+  DirectoryIndex index.php index.html index.jsp
+  ServerName {{ inventory_hostname }}
+# Virtual hosts HTTP
+# Ejemplo de formato
+#apache2_vhosts:
+#  - listen_port:
+#    servername: test
+#    serveralias:
+#    serveradmin: sistemas@xeridia.es
+#    previous_extra_parameters:
+#    is_ssl:
+#    proxy_pass_port:
+#    mod_jk_nojks: []
+#    mod_jk_mounts:
+#      - { url: "/*", loadbalancer: "" }
+#    mod_jk_unmounts:
+#      - { url: "/*", loadbalancer: "" }
+#    mod_jk_status: false
+#    documentroot:
+#    location:
+#    location_content:
+#    extra_parameters:
+#    error_log:
+#    access_log:
+apache2_vhosts: []
+# Virtual hosts HTTP adicionales, mismo formato que los Virtual hosts HTTP
+# apache2_additional_vhosts: []
+
+# Virtual hosts HTTPS
+# Ejemplo de formato
+#apache2_vhosts_ssl:
+#  - listen_port:
+#    servername: test
+#    serveralias:
+#    serveradmin: sistemas@xeridia.es
+#    previous_extra_parameters:
+#    proxy_pass_port:
+#    mod_jk_nojks: []
+#    mod_jk_mounts:
+#      - { url: "/*", loadbalancer: "" }
+#    mod_jk_unmounts:
+#      - { url: "/*", loadbalancer: "" }
+#    mod_jk_status: false
+#    documentroot:
+#    location:
+#    location_content:
+#    cipher_suite: "AES256+EECDH:AES256+EDH"
+#    protocol: "All -SSLv2 -SSLv3"
+#    certificate_file_path:
+#    certificate_key_file_path:
+#    certificate_chain_file_path:
+#    extra_parameters:
+#    error_log:
+#    access_log:
+apache2_vhosts_ssl: []
+# Virtual hosts HTTPS adicionales, mismo formato que los Virtual hosts HTTPS
+# apache2_additional_vhosts_ssl: []
+
+# Configuracion de apache. Afecta al fichero de configuracion global.
+# Ejemplo de formato
+# apache2_configuration_items:
+#   - { option: "EnableMMAP",value: "on" }
+#   - { option: "EnableSendfile",value: "off" }
+apache2_configuration_items: []
+
+# Autoindex
+apache2_autoindex_conf: []
+apache2_autoindex_location: []
+
+# Modsecurity
+apache2_modsecurity_enable: false
+apache2_modsecurity_rules: []
+apache2_modsecurity_disabledrules: []
+apache2_modsecurity_config: []
+
+# mod_jk
+# Si se utiliza el mod_jk con balanceadores
+apache2_mod_jk_enabled: false
+# Ruta al fichero de log
+apache2_mod_jk_log:
+# Nivel de log
+apache2_mod_jk_loglevel: warn
+# Si se monta el status
+apache2_mod_jk_status_enable: false
+# URL para acceder al estado
+apache2_mod_jk_status_url: /status
+# Nombre del fichero de workers
+apache2_mod_jk_workers_file: workers.properties
+# Balanceadores
+# Ejemplo de formato
+# apache2_mod_jk_loadbalancers:
+#   - name: loadbalancer1
+#     directives: { sticky_session: true }
+#     servers:
+#       - name: server1
+#         directives: { host: localhost, port: 8009, type: ajp13, lbfactor: 1 }
+#       - name: server2
+#         directives: { host: localhost, port: 8009, type: ajp13, lbfactor: 1 }
+#   - name: loadbalancer2
+#     directives: { sticky_session: true }
+#     servers:
+#       - name: server3
+#         directives: { host: localhost, port: 8009, type: ajp13, lbfactor: 1 }
+#       - name: server4
+#         directives: { host: localhost, port: 8009, type: ajp13, lbfactor: 1 }
+apache2_mod_jk_loadbalancers: []
+# Versión mod_jk RedHat
+apache2_mod_jk_redhat_version: 1.2.46
+# Ruta donde descargar mod_jk
+apache2_mod_jk_redhat_install_location: /tmp
+
+# mod_limitipconn
+# Si se utiliza el mod_limitipconn
+apache2_mod_limitipconn_enabled: false
+# Versión mod_limitipconn
+apache2_mod_limitipconn_version: 0.24
+# Ruta donde descargar mod_limitipconn
+apache2_mod_limitipconn_install_location: /tmp
+
+# mod_proxy
+apache2_mod_proxy_balancer_enabled: false

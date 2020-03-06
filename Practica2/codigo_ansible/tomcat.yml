@@ -1,0 +1,25 @@
+---
+# Playbook para instalar Tomcat + Apache y desplegar una App en máquinas Oracle Linux
+#
+#
+
+# Play de instalación Tomcat + Apache y despliegue de aplicación (.war)
+- name: Instalación Tomcat + Apache y despliegue de aplicación
+  hosts: devops1.local
+  user: vagrant
+  become: true
+  roles:
+    - { role: "host_config"}
+    - { role: "apache2" }
+    - { role: "tomcat" }
+    - { role: "deploy_app" }
+
+# Play para la validación del despliegue
+- name: Testeo de la instalación
+  hosts: devops1.local
+  user: vagrant
+  become: true
+  roles:
+    - { role: "test_deploy" }
+
+...

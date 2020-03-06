@@ -1,0 +1,15 @@
+galaxy_info:
+  author: DevOps Xeridia
+  description: Testeo de servicios
+  company: Xeridia S.L.
+
+
+  license: license (GPL-2.0-or-later, MIT, etc)
+
+  min_ansible_version: 2.4
+
+  galaxy_tags: []
+
+dependencies: []
+
+  

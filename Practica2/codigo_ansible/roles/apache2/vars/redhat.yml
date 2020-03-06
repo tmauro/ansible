@@ -1,0 +1,38 @@
+apache2_packages:
+  - httpd
+  - openssl
+  - mod_ssl
+
+apache2_devel_packages:
+  - httpd-devel
+  - gcc
+  - make
+
+apache2_service: httpd
+
+apache2_ssl_cert_dir: /etc/pki/tls/certs
+apache2_ssl_privkey_dir: /etc/pki/tls/private
+
+apache2_daemon: httpd
+apache2_daemon_path: /usr/sbin/
+
+apache2_conf_path: /etc/httpd
+apache2_conf_file: conf/httpd.conf
+apache2_ports_conf_file: conf/httpd.conf
+apache2_conf_d_path: "{{ apache2_conf_path }}/conf.d"
+
+apache2_modsecurity_path: /etc/httpd/modsecurity.d/
+apache2_modsecurity_rules_dir: /etc/httpd/modsecurity.d/activated_rules
+
+apache2_default_vhost_filename: conf.d/default.conf
+
+apache2_log_dir: /var/log/httpd
+apache2_access_log: access_log
+apache2_ssl_access_log: ssl_access_log
+apache2_error_log: error_log
+apache2_ssl_error_log: ssl_error_log
+apache2_mod_jk_error_log: mod_jk_error_log
+
+apache2_mod_jk_redhat_download_url: http://apache.uvigo.es/tomcat/tomcat-connectors/jk/tomcat-connectors-{{ apache2_mod_jk_redhat_version }}-src.tar.gz
+
+apache2_mod_jk_conf_file: "{{ apache2_conf_d_path }}/mod_jk.conf"

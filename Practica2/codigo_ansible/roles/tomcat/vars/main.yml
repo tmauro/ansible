@@ -1,0 +1,10 @@
+---
+# vars file for tomcat
+
+tomcat_service_name: "tomcat"
+
+tomcat_home: "/usr/share/{{ tomcat_service_name }}"
+
+tomcat_config_base_changes:
+ - { option: "JAVA_HOME", value: "{{ tomcat_java_cmd }}" }
+ - { option: "JAVA_OPTS", value: "{{ tomcat_java_opts }} -Xms{{ tomcat_java_heap }} -Xmx{{ tomcat_java_heap }}" }

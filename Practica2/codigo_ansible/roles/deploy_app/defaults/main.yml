@@ -1,0 +1,8 @@
+---
+# defaults file for ./deploy_app
+
+tomcat_webapps_folder: /usr/share/tomcat/webapps
+
+app_war_file_name: []
+
+

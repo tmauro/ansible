@@ -1,0 +1,17 @@
+---
+# task file for sis_upgrade_centos_hosts
+
+- name: install required packages
+  yum: 
+    name: yum-utils
+    state: present
+- name: install security updates with yum
+  yum:
+    name: '*'
+    state: latest
+    security: yes
+- name: install all kernel updates with yum
+  yum:
+    name: 'kernel*'
+    state: latest
+...

@@ -1,0 +1,22 @@
+---
+# tasks file for ./deploy_app
+
+- name: Detiene servicio Tomcat
+  service:
+    name: "{{ tomcat_service_name }}"
+    state: stopped
+
+- name: Copia fichero .WAR a directorio webapps
+  copy:
+    src: "files/{{ app_war_file_name }}"
+    dest: "{{ tomcat_webapps_folder }}"
+    owner: "{{ tomcat_service_name }}"
+    group: "{{ tomcat_service_name }}"
+    mode: 0644
+
+- name: Recarga servicio Tomcat
+  service:
+    name: "{{ tomcat_service_name }}"
+    state: started
+
+...

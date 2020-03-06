@@ -1,0 +1,25 @@
+{% if apache2_mod_jk_enabled %}
+worker.list={% if apache2_mod_jk_status_enable %}status{% if apache2_mod_jk_loadbalancers %},{% endif %}{% endif %}{{ apache2_mod_jk_loadbalancers | map(attribute='name') | join(',') }}
+
+	{% if apache2_mod_jk_status_enable %}
+worker.status.type=status
+	{% endif %}
+
+	{% for loadbalancer in apache2_mod_jk_loadbalancers %}
+worker.{{ loadbalancer.name }}.type=lb
+worker.{{ loadbalancer.name }}.balance_workers={{ loadbalancer.servers | map(attribute='name') | join(',') }}
+		{% if loadbalancer.directives | default({}) %}
+			{% for key, value in loadbalancer.directives.iteritems() %}
+worker.{{ loadbalancer.name }}.{{ key }}={{ value }}
+			{% endfor %}
+		{% endif %}
+		{% for loadbalancerserver in loadbalancer.servers | default([]) %}
+			{% if loadbalancerserver.directives | default({}) %}
+				{% for key, value in loadbalancerserver.directives.iteritems() %}
+worker.{{ loadbalancerserver.name }}.{{ key }}={{ value }}
+				{% endfor %}
+			{% endif %}
+		{% endfor %}
+
+	{% endfor %}
+{% endif %}

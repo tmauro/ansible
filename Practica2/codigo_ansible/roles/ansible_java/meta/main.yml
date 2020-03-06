@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: Kevin Brebanov
+  description: Installs Java
+  company:
+  license: BSD
+  min_ansible_version: 1.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+  galaxy_tags:
+    - development
+dependencies: []

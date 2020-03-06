@@ -1,0 +1,82 @@
+#!groovy
+
+node('ansible') {
+try{
+	stage('Checkout') {
+		git branch: '${BRANCH_NAME}', changelog: false, credentialsId: 'Jenkins', poll: false, url: 'ssh://bitbucket.xeridia.com:7999/sis/tomcat.git'
+	}
+	stage('Prepare') {
+		// symlink
+		sh "ln -s -f ${WORKSPACE} ${WORKSPACE}/tests/tomcat"
+		
+		dir("tests") {
+			// Requirements
+			sh "ansible-galaxy install -r requirements.yml -f -p roles"
+		}
+	}
+	stage('Build') {
+		dir("tests") {
+			// Check syntax
+			sh 'ansible-playbook test.yml --syntax-check'
+		}
+	}
+	stage('Lint') {
+		dir("tests") {
+			try {
+				// Check syntax
+				sh 'ansible-lint test.yml --exclude=/etc/ansible/roles/docker_dynamic_inventory_provisioner/ --exclude=test.yml'
+			} catch (err) {
+				currentBuild.result = 'UNSTABLE'
+			}
+		}
+	}
+	stage('Test') {
+		dir("tests") {
+			try {
+				// Run tests
+				def testresult = sh returnStatus: true, script: '''
+# Run the role/playbook with ansible-playbook
+ansible-playbook test.yml -i inventory
+
+# Run the role/playbook again, checking to make sure it is idempotent
+ansible-playbook test.yml -i inventory | tee ansible_test.output
+
+result=0
+
+declare -a arr=("centos7")
+for i in "${arr[@]}"
+do
+	if grep -q "${i}\\s*:\\s*ok=10\\s*changed=0\\s*unreachable=0\\s*failed=0" ansible_test.output; then
+		echo "[$i] Idempotence test: pass"
+	else
+		echo "[$i] Idempotence test: fail"
+		result=100
+	fi
+done
+
+exit $result
+			'''
+				if (testresult == 100) {
+					echo 'Casos de test no superados'
+					currentBuild.result = 'UNSTABLE'
+				} else if (testresult != 0) {
+					echo "Error al ejecutar los casos de test ${testresult}"
+					currentBuild.result = 'FAILURE'
+				}
+			} catch (err) {
+				echo 'Error no controlado al ejecutar los casos de test'
+				currentBuild.result = 'FAILURE'
+			} finally {
+				// Stop docker images
+				sh "ansible-playbook test.yml -i inventory -e 'docker_dynamic_inventory_provisioner_stop=True' -l 'localhost'"
+			}
+		}
+	}
+} finally {
+	stage('Notify') {
+		emailext body: '''$JOB_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:
+
+Check console output at $BUILD_URL to view the results.''', recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'RequesterRecipientProvider'], [$class: 'DevelopersRecipientProvider']], subject: '$JOB_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!', to: 'juan.gago@xeridia.com'
+	}
+}
+}

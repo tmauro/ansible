@@ -1,0 +1,9 @@
+---
+# handlers file for tomcat
+- name: reload tomcat
+  command: systemctl daemon-reload
+
+- name: restart tomcat
+  service:
+    name: "{{ tomcat_service_name }}"
+    state: restarted

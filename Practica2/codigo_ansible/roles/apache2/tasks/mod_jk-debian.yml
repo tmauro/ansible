@@ -1,0 +1,14 @@
+
+- name: mod_jk | Instalar paquete
+  package:
+    name: "libapache2-mod-jk"
+    state: present
+  notify: restart apache2
+  tags: ["install"]
+
+- name: mod_jk | Habilitar módulo Apache
+  apache2_module:
+    name: jk
+    state: present
+  notify: restart apache2
+  tags: ["config"]

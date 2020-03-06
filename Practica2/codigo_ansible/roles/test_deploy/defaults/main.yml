@@ -1,0 +1,9 @@
+---
+# defaults file for ./test_deploy
+
+server_url: localhost
+
+# Lista de servicios a revisar
+service_test_list:
+  - httpd
+  - firewalld

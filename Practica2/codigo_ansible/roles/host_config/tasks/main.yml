@@ -1,0 +1,36 @@
+---
+# Rol para configurar los hosts
+
+# Esta tarea añade una linea al fichero hosts con el nombre de la máquina y su ip
+- name: Configuración fichero /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ linea_etc_host }}"
+
+# Tarea que habilita los servicios indicados en el firewall
+- name: Configuración firewall (servicios)
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items: "{{ lista_servicios_firewall }}"
+
+# Tarea que abre los puertos indicados en el firewall
+- name: Configuración firewall (puertos)
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items: "{{ lista_puertos_firewall }}"
+
+- name: Recarga Servicio firewall
+  service:
+    name: firewalld
+    state: restarted
+
+
+# Desactiva Selinux
+- name: Disable SELinux
+  selinux:
+    state: disabled
+

@@ -1,0 +1,69 @@
+---
+# defaults file for tomcat
+
+# Versión a instalar
+tomcat_version: 7.0.76
+
+# Si se utiliza la dependencia del OpenJDK por defecto
+tomcat_is_java_required: True
+
+# Ejecutable JAVA
+tomcat_java_cmd: /usr/
+
+# Opciones JAVA
+tomcat_java_opts: 
+
+# Memoria utilizada por el proceso JAVA
+tomcat_java_heap: 512M
+
+# Configuración adicional Tomcat, las opciones disponibles detalladas en la documentacion de la versión instalada
+# Ejemplo de formato:
+#   - { option: "LANG", value: "en_US" }
+tomcat_config_changes: []
+
+# Configuración de Tomcat, ubicada en el fichero web.xml
+# Ejemplo de formato:
+#   - { section: "session-config", option: "tracking-mode", value: "COOKIE" }
+tomcat_config_web: []
+
+# hostname Tomcat
+tomcat_hostname: "localhost"
+
+# Puerto Tomcat
+tomcat_server_port: "8005"
+
+# Puerto HTTP
+tomcat_catalina_port: "8080"
+
+# Puerto AJP
+tomcat_ajp_port: "8009"
+
+# Hilos
+tomcat_max_threads: "200"
+
+# Carpeta donde se instalan aplicaciones
+tomcat_webapps_dir: "webapps"
+
+# Configuración catalina.properties
+# Ejemplo de formato:
+#   - { option: "prop1", value: "val1" }
+tomcat_catalina_configs: []
+
+# GlobalNamingResource en la configuración server.xml
+# Ejemplo de formato:
+#   - { auth: "Container", name: "jdbc/EmployeeDB", type: "javax.sql.DataSource", username: "dbusername", password: "dbpassword", driverClassName: "org.hsql.jdbcDriver", url: "jdbc:HypersonicSQL:database", maxActive: "8", maxIdle: "4" }
+tomcat_global_naming_resources: []
+
+# JARs adicionales para copiar en {{ tomcat_home }}/lib/
+# Ejemplo de formato:
+#   - /tmp/jasypt-1.9.0.jar
+tomcat_additional_jars: []
+
+# Variables de entorno para el usuario tomcat
+tomcat_env_vars: []
+
+# Número de hilos que se usan para arrancar elementos en paralelo
+tomcat_startstopthreads: "1"
+
+#sessionCookieDomain enabled
+session_cookie_domain_enabled: True

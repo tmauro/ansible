@@ -1,0 +1,30 @@
+- name: mod_limitipconn | Instalar paquetes compilación
+  package:
+    name: "{{ item.1 }}"
+    state: present
+  with_indexed_items: "{{ apache2_devel_packages }}"
+  tags: ["install"]
+
+- name: mod_limitipconn | Variables
+  set_fact:
+    _apache2_mod_limitipconn_build_location: "{{ apache2_mod_limitipconn_install_location }}/mod_limitipconn-{{ apache2_mod_limitipconn_version }}"
+
+- name: mod_limitipconn | Directorio descarga
+  file:
+    path: "{{ apache2_mod_limitipconn_install_location }}"
+    state: directory
+  tags: ["install"]
+
+- name: mod_limitipconn | Descargar código fuente
+  unarchive:
+    src: "{{ apache2_mod_limitipconn_download_url }}"
+    remote_src: yes
+    dest: "{{ apache2_mod_limitipconn_install_location }}"
+    creates: "{{ _apache2_mod_limitipconn_build_location }}"
+  tags: ["install"]
+
+- name: mod_limitipconn | Compilación
+  command: make install
+  args:
+    chdir: "{{ _apache2_mod_limitipconn_build_location }}"
+  tags: ["install" , "skip_ansible_lint"]

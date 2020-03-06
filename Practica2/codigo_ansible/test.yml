@@ -1,0 +1,11 @@
+---
+# Playbook para La validación de las instalaciones
+#
+
+- name: Validación de despliegues
+  hosts: all
+  user: vagrant
+  become: true
+  roles:
+    - { role: "test_deploy"}
+...

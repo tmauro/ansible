@@ -1,0 +1,11 @@
+---
+# defaults file for ./host_config
+
+# Lista de servicios por defecto para habilitar en el firewall
+lista_servicios_firewall: []
+
+lista_puertos_firewall: []
+
+# Configuración /etc/hosts por defecto
+
+linea_etc_host: "{{ ansible_eth1.ipv4.address }} {{ ansible_fqdn }}"

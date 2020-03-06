@@ -1,0 +1,18 @@
+galaxy_info:
+  author: Juan Gago
+  description: Instalación Apache 2.X
+  company: Xeridia
+  version: 1.8.4
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 2.2.0.0
+  platforms:
+    - name: EL
+      versions:
+        - 7
+    - name: Debian
+      versions:
+        - jessie
+
+  categories: []
+
+dependencies: []

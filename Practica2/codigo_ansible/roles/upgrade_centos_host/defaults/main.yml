@@ -1,0 +1,9 @@
+---
+# defaults file for sis_upgrade_centos_hosts
+
+# ospatch_level: [none|security|full]
+
+ospatch_level: full
+
+...
+

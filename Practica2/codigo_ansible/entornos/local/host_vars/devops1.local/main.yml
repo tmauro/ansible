@@ -1,0 +1,60 @@
+---
+# Fichero de Variables de entorno.
+
+
+# Directivas globales
+
+devops1_servername: devops1.devops.local
+devops1_admin_mail: david.rodriguez@xeridia.com
+server_url: "{{ devops1_servername }}"
+
+# Configuración del firewall - lista servicios permitidos
+lista_servicios_firewall:
+  - https
+
+# Configuración del firewall - lista puertos permitidos
+lista_puertos_firewall:
+  - 8080/tcp
+
+# Variables Tomcat
+tomcat_env_vars:
+  - { key: "CATALINA_HOME", value: "{{ tomcat_home }}"}
+
+app_war_file_name: ROOT.war
+
+# Variables Apache2
+
+apache2_global_vhost_settings: |
+  DirectoryIndex index.php index.html index.jsp
+
+
+apache2_remove_default_vhost: True
+# Si se debe crear el fichero de Virtual hosts
+apache2_create_vhosts: True
+# Nombre del fichero de Virtual hosts
+apache2_vhosts_filename: "{{ devops1_servername }}.conf"
+
+# Virtual hosts HTTP
+apache2_vhosts: 
+  - serveradmin: "{{ devops1_admin_mail }}"
+    servername: "{{ devops1_servername }}"
+    is_ssl: True
+
+# Virtual hosts HTTPS
+apache2_vhosts_ssl: 
+  - serveradmin: "{{ devops1_admin_mail }}"
+    servername: "{{ devops1_servername }}"
+    proxy_pass_port: 8080
+    protocol: "All -SSLv3"
+    cipher_suite: "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS"
+    certificate_file_path: "{{ devops1_servername }}"
+    certificate_key_file_path: "{{ devops1_servername }}"
+
+# Lista de servicios a testear
+service_test_list:
+  - tomcat
+  - httpd
+  - firewalld
+  - rsyslog
+
+...

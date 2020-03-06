@@ -1,0 +1,33 @@
+---
+# Playbook para demo Ansible
+#
+#
+
+# Play para la gestión de servicios
+- name: Play para la gestión de servicios
+  hosts: devops0.local
+  user: vagrant
+  become: true
+  vars:
+    lista_servicios:
+      - firewalld
+      - crond
+
+  tasks:
+    - name: Levanta los servicios si no lo están
+      service:
+        name: "{{ item }}"
+        state: started
+      with_items: "{{ lista_servicios }}"
+
+    - name: Detiene uno de los servicios
+      service:
+        name: "{{ lista_servicios[1] }}"
+        state: stopped
+
+    - name: Comprueba el estado de los servicios
+      shell: service {{ item }} status
+      with_items: "{{ lista_servicios }}"
+      ignore_errors: yes
+
+...

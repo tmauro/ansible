@@ -1,0 +1,61 @@
+---
+# Fichero de Variables de entorno Cifradas.
+#
+# Certificados SSL
+#
+apache2_ssl_certificates:
+  - filename: "{{ devops1_servername }}"
+    crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIDPjCCAiYCCQCZjS6wOCogaTANBgkqhkiG9w0BAQsFADBhMQswCQYDVQQGEwJY
+      WDEVMBMGA1UEBwwMRGVmYXVsdCBDaXR5MRwwGgYDVQQKDBNEZWZhdWx0IENvbXBh
+      bnkgTHRkMR0wGwYDVQQDDBRkZXZvcHMxLmRldm9wcy5sb2NhbDAeFw0yMDAyMTgw
+      OTEyMjhaFw0yMjEyMDgwOTEyMjhaMGExCzAJBgNVBAYTAlhYMRUwEwYDVQQHDAxE
+      ZWZhdWx0IENpdHkxHDAaBgNVBAoME0RlZmF1bHQgQ29tcGFueSBMdGQxHTAbBgNV
+      BAMMFGRldm9wczEuZGV2b3BzLmxvY2FsMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+      MIIBCgKCAQEA3jU47fgwUT9wMCrPenZzNSXCOsq9GOpJIaYVmNiUO+QIn9N6iQ6Z
+      wF40WSuyGosXOnrNQOyyK2AcEPvoosg3IQqv6oPCnILczqTXjjZg1j7Wrym3B55I
+      NvRk6paTtGxFAcFDkOCELJ4EJ72lGjVVGRjZwJTORrBpZc3jIn2dZnUOsvxZVMeZ
+      FOCOx5CC0o+QBjMnQ9k1FIC9vyP3lSSpb2nvD/BJdWErBhzKsyry5DhzwDy2ddp9
+      XHuVexUvIvRZ+ffPXJ8k2hqDoomOrH9yLpw4doKi6pUtne/UmAu/hFpnlAaUESbS
+      5tMlEVhcFbGn58jJ1zB/M5sWcvf0Os4s5wIDAQABMA0GCSqGSIb3DQEBCwUAA4IB
+      AQDY4covaTHDUzTGdimaIkY4gNG2b4baujGuR3Gi5UUP26u13iTpVKUBvQMNdCod
+      14vxArQM7rCbm7L1Ls8x7gdzJKG8M7FTeP9vQcDqPSel391yuuMG3CitQzbu1aYw
+      od/PSQc+9feOpHmYHLL5I6eIVZrbYVKEYhvmSjHXBDqjKQ+OBTYdB9ABP7YcCXq9
+      NBA+F7sd8TkuWCYxkb07e9Vg9f3kVMK4GRC/YEX2zNkhoLiLVm2wt8D0e4DtjP7A
+      HADoHnRzZpS3QdbIxu8QdMAFTBC+BwB1QFLF85Csep7sHSgaeS5hgukSjCTk4SD7
+      6VKYYLXyWjdeh3PSeSOoTl0D
+      -----END CERTIFICATE-----
+  - filename: "{{ devops1_servername }}"
+    crt: |
+      -----BEGIN CERTIFICATE-----
+      MIIEowIBAAKCAQEA3jU47fgwUT9wMCrPenZzNSXCOsq9GOpJIaYVmNiUO+QIn9N6
+      iQ6ZwF40WSuyGosXOnrNQOyyK2AcEPvoosg3IQqv6oPCnILczqTXjjZg1j7Wrym3
+      B55INvRk6paTtGxFAcFDkOCELJ4EJ72lGjVVGRjZwJTORrBpZc3jIn2dZnUOsvxZ
+      VMeZFOCOx5CC0o+QBjMnQ9k1FIC9vyP3lSSpb2nvD/BJdWErBhzKsyry5DhzwDy2
+      ddp9XHuVexUvIvRZ+ffPXJ8k2hqDoomOrH9yLpw4doKi6pUtne/UmAu/hFpnlAaU
+      ESbS5tMlEVhcFbGn58jJ1zB/M5sWcvf0Os4s5wIDAQABAoIBAD1BCqp+6kLba/+7
+      LWqi0GtsNzihvrLpkrNV50o1GdfQqpf0Yij5/2RKE8ApDXXHteWHCKHHHe5bFiGQ
+      b7a/3oKbQZcyLymZ4WiNhGZNkzA8Lk4m/6938IxFnrQUQi9QUU2Eiy2a1pS+EoMq
+      AiNRZF4AvbYazyopY0SPFvfhDMy7ID4jKKZFtxnCf+Ch8g87oYBgj4H6FKE90+2y
+      22sDWst4h3vSKREvL2SHsCVMAJdSo5zGdqZCSpzzFrZGiITycTi95DIkvtGv9Yi5
+      a8PHEMDFLZpJAygHLcmgYLUwzEU65MhMPUXM3CNEK5ueXm+5DjoXblSJh08EDANn
+      PYu0OuECgYEA/25sSzxHmU0imhxruEhY/R1rknMkQJ2r3G8umeM1AbLLBWoJoLjQ
+      ERmlFhme2n9oqfSoANe/wuvo2Bh8Wu0GQra91/CfMuxm1yAuii1dfcH+E85QsxWw
+      pKBLY/CPczTXJ2AaiKovXnu2htDM+Sd5gchV+0gLOw4N5rJhEv2cLS8CgYEA3rPd
+      TNmFrRcLYx+1+EsL6TTCe00Zadw6PNSjP2af2dwIGWWZ9QKe+t3UHUaXqOlmSqO7
+      qFDOc5ljRjGin541pff+sXLYSHIuy9DYY55oqCmJZIQNW20FGdsti/sKWTSEGdAX
+      nCpCY1PIfbheWkHNgRRmh4nKjOOcuxxIFGidvckCgYB5qi8K5vtzmboRjdgBPvSk
+      G49RgmaSIIfrx0l7Iy3sUS1Ctu8/DsiMXJq1nB5+FJHV4iLjw+AjCBswUvlold2V
+      iVWDtakeqFuTvFBuoI0XiX9sD6mAo6QvxeojAEJTraeNqcj5r5ZAeszGCk6XnqXR
+      m4rY1cgDqP4WFIEIeqQZIQKBgDihMh/tnEFkf7/H+4TUyIWXpfCmrVSu7Jw1UgG4
+      PeOvQNv8awbTkMuoBt0e60fHefx24CwvyB+7HHRoALtoBqpagohq9LaPWnj3dV73
+      lBNW5JoLvj3GXiqyAkX7IymF4iWSNb6/PDx3vJ7DeDKpUvGE14GVt0zWQC+QRH/0
+      DlCJAoGBAKUGgb1WszmADEb2f9ePkieVMUMoJ2Ecxw006/Z+zD2E18O2yO9DR/jQ
+      zliS0E3jByDYYMdWI1VfFGl/COiojFYTyBKiyLrM0vi5TIxLKkW70DudRbME4dxc
+      6xxAQCl6GU+pE2+MzgJYTVkw5zMn3zlwtKt4zsDWqOHpjC2bxVDx
+      -----END CERTIFICATE-----
+    is_key: True
+
+
+...

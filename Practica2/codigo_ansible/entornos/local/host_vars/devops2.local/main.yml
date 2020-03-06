@@ -1,0 +1,47 @@
+---
+# Fichero de Variables de entorno.
+
+
+# Directivas globales
+
+sonarqube_servername: #  RELLENAR fqdn del servidor #
+sonarqube_admin_mail: # RELLENAR Email #
+server_url: "{{ sonarqube_servername }}"
+
+# Configuración del firewall - lista servicios permitidos
+lista_servicios_firewall:
+# RELLENAR lisa de servicios para permitir en firewall
+
+# Variables Apache2
+
+apache2_global_vhost_settings: |
+  DirectoryIndex index.php index.html index.jsp
+
+apache2_remove_default_vhost: True
+# Si se debe crear el fichero de Virtual hosts
+apache2_create_vhosts: True
+# # Nombre del fichero de Virtual hosts
+apache2_vhosts_filename: "{{ sonarqube_servername }}.conf"
+
+# Virtual hosts HTTP
+apache2_vhosts: 
+  - serveradmin: "{{ sonarqube_admin_mail }}"
+    servername: "{{ sonarqube_servername }}"
+    is_ssl: True
+
+# Virtual hosts HTTPS
+apache2_vhosts_ssl: 
+  - serveradmin: "{{ sonarqube_admin_mail }}"
+    servername: "{{ sonarqube_servername }}"
+    proxy_pass_port: 9000
+    protocol: "All -SSLv3"
+    cipher_suite: "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS"
+    certificate_file_path: "{{ sonarqube_servername }}"
+    certificate_key_file_path: "{{ sonarqube_servername }}"
+
+# Lista de servicios a testear
+service_test_list:
+# RELLENAR Lista de servicios a testear
+
+
+...

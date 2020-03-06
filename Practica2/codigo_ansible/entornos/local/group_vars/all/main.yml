@@ -1,0 +1,7 @@
+---
+# Variables de grupo para todos los hosts.
+
+# Permite desactivar no_log en entornos de desarrollo para hacer debug.
+no_log_var: false
+
+...

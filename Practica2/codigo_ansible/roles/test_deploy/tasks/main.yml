@@ -1,0 +1,22 @@
+---
+# tasks file for ./test_deploy
+
+- name: Test web deploy
+  uri:
+    url: "https://{{ server_url }}"
+    validate_certs: no
+  register: salida_uri
+  ignore_errors: yes
+
+- name: Test Servicios
+  service_facts:
+  register: salida_servicios
+
+- name: Comprueba estado servicios
+  debug:
+    var: salida_servicios.ansible_facts.services["{{ item }}.service"].state
+  with_items: "{{ service_test_list }}"
+
+- name: Comprueba estado servicio web
+  debug:
+    msg: Estado del servidor "{{ salida_uri.status }}"

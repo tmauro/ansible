@@ -1,0 +1,12 @@
+devops0.local ansible_host=192.168.30.100
+devops1.local ansible_host=192.168.30.20
+devops2.local ansible_host=192.168.30.30
+
+[web]
+devops0.local ansible_host=192.168.30.100
+devops1.local ansible_host=192.168.30.20
+
+[all]
+devops0.local ansible_host=192.168.30.100
+devops1.local ansible_host=192.168.30.20
+devops2.local ansible_host=192.168.30.30

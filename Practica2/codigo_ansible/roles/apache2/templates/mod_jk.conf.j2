@@ -1,0 +1,5 @@
+{% if apache2_mod_jk_enabled %}
+JkWorkersFile {{ apache2_mod_jk_conf_path }}/{{ apache2_mod_jk_workers_file }}
+JkLogFile {{ apache2_mod_jk_log | ternary(apache2_mod_jk_log, apache2_log_dir + '/' + apache2_mod_jk_error_log) }}
+JkLogLevel {{ apache2_mod_jk_loglevel }}
+{% endif %}

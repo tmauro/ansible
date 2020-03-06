@@ -1,0 +1,30 @@
+---
+# Fichero de Variables de entorno Cifradas.
+#
+# Certificados SSL
+#
+# Comandos para generar certificados SLL
+#
+# CAMBIAR server_name por nuestro FQDN
+
+#openssl genrsa -out server_name.key 2048
+#openssl req -new -key server_name.key -out server_name.csr
+#openssl x509 -req -days 1024 -in server_name.csr -signkey server_name.key -out server_name.crt
+#
+
+
+apache2_ssl_certificates:
+  - filename: "{{ sonarqube_servername }}"
+    crt: |
+      -----BEGIN CERTIFICATE-----
+
+      -----END CERTIFICATE-----
+  - filename: "{{ sonarqube_servername }}"
+    crt: |
+      -----BEGIN CERTIFICATE-----
+
+      -----END CERTIFICATE-----
+    is_key: True
+
+
+...

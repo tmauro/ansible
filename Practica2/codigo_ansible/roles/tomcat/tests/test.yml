@@ -1,0 +1,16 @@
+---
+
+- name: Bring up docker containers
+  hosts: localhost
+  gather_facts: false
+  vars:
+    inventory:
+      - name: tomcat_centos7
+        image: "xeridia/centos7"
+  roles:
+    - { role: docker_dynamic_inventory_provisioner, docker_dynamic_inventory_provisioner_inventory: "{{inventory}}", docker_dynamic_inventory_provisioner_restart_containers_on_startup: no }
+
+- hosts: docker_containers
+  remote_user: root
+  roles:
+    - { role: tomcat }

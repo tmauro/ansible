@@ -1,0 +1,36 @@
+- name: mod_jk | Instalación Debian
+  include: mod_jk-debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: mod_jk | Instalación RedHat
+  include: mod_jk-redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- name: mod_jk | Configuración
+  template:
+    src: mod_jk.conf.j2
+    dest: "{{ apache2_mod_jk_conf_file }}"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart apache2
+  tags: ["config"]
+
+- name: mod_jk | Directorio configuración workers
+  file:
+    path: "{{ apache2_mod_jk_conf_path }}/{{ apache2_mod_jk_workers_file | dirname }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  tags: ["config"]
+
+- name: mod_jk | Configuración workers
+  template:
+    src: workers.properties.j2
+    dest: "{{ apache2_mod_jk_conf_path }}/{{ apache2_mod_jk_workers_file }}"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart apache2
+  tags: ["config"]

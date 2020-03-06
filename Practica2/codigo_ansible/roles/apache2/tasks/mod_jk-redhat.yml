@@ -1,0 +1,69 @@
+
+- name: mod_jk | Instalar paquetes compilación
+  package:
+    name: "{{ item.1 }}"
+    state: present
+  with_indexed_items:
+    - httpd-devel
+    - apr
+    - apr-devel
+    - apr-util
+    - apr-util-devel
+    - gcc
+    - gcc-c++
+    - make
+    - autoconf
+    - libtool
+  tags: ["install"]
+
+- name: mod_jk | Variables
+  set_fact:
+    _apache2_mod_jk_redhat_build_location: "{{ apache2_mod_jk_redhat_install_location }}/tomcat-connectors-{{ apache2_mod_jk_redhat_version }}-src/native"
+
+- name: mod_jk | Directorio descarga
+  file:
+    path: "{{ apache2_mod_jk_redhat_install_location }}"
+    state: directory
+  tags: ["install"]
+
+- name: mod_jk | Descargar código fuente
+  unarchive:
+    src: "{{ apache2_mod_jk_redhat_download_url }}"
+    remote_src: yes
+    dest: "{{ apache2_mod_jk_redhat_install_location }}"
+    creates: "{{ _apache2_mod_jk_redhat_build_location }}"
+  tags: ["install"]
+
+- name: mod_jk | Configurar compilación
+  command: ./configure --with-apxs=/usr/bin/apxs --enable-api-compatibility
+  args:
+    chdir: "{{ _apache2_mod_jk_redhat_build_location }}"
+    creates: "{{ _apache2_mod_jk_redhat_build_location }}/Makefile"
+  tags: ["install"]
+
+- name: mod_jk | Compilación
+  command: make
+  args:
+    chdir: "{{ _apache2_mod_jk_redhat_build_location }}"
+    creates: "{{ _apache2_mod_jk_redhat_build_location }}/apache-2.0/mod_jk.so"
+  tags: ["install"]
+
+- name: mod_jk | Librería final
+  copy:
+    src: "{{ _apache2_mod_jk_redhat_build_location }}/apache-2.0/mod_jk.so"
+    remote_src: yes
+    dest: /etc/httpd/modules/mod_jk.so
+    mode: 0644
+    owner: root
+    group: root
+  tags: ["install"]
+
+- name: mod_jk | Habilitar módulo Apache
+  copy:
+    src: 00-mod_jk.conf
+    dest: /etc/httpd/conf.modules.d/
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart apache2
+  tags: ["config"]

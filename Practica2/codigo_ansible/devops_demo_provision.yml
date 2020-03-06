@@ -1,0 +1,30 @@
+---
+# Playbook para demo Ansible
+#
+
+# Play para provisionar una máquina con la paqueteria necesaria
+- name: Play para la provisión de máquinas.
+  hosts: devops0.local
+  user: vagrant
+  become: true
+  vars:
+    lista_paquetes:
+      - httpd
+      - java
+
+  tasks:
+    - name: Instala paquetes en máquina a gestionar.
+      yum:
+        name: "{{ lista_paquetes }}"
+        state: latest
+
+    - name: Comprueba que los paquetes se hayan instalado
+      shell: yum list installed | grep {{ item }}
+      with_items: "{{ lista_paquetes }}"
+      register: paquetes_instalados
+
+    - name: Muestra estado de los paquetes
+      debug:
+        msg: "{{ item.stdout_lines }}"
+      with_items: "{{ paquetes_instalados.results }}"
+...

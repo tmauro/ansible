@@ -1,0 +1,24 @@
+---
+# Playbook para instalar Sonarqube 
+# SonarQube
+#
+
+# Play para Configurar la máquina, instalar Apache y Sonarqube
+- name: Instalacion SonarQube
+  hosts: devops2.local
+  user: vagrant
+  become: true
+  roles:
+    - { role: "host_config"}
+    - { role: "apache2" }
+    - { role: "sonarqube" }
+
+# Play para Validar la instalación de Sonarqube
+- name: Validación de la instalación de Sonarqube
+  hosts: devops2.local
+  user: vagrant
+  become: true
+  roles:
+    - { role: "test_deploy" }
+
+...

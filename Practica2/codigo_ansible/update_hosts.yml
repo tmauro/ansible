@@ -1,0 +1,12 @@
+---
+# Playbook para actualizar máquinas
+# 
+#
+
+- name: Update hosts 
+  hosts: all
+  user: root
+  roles:
+    - { role: "upgrade_centos_host", tags: ["update"] } 
+
+...

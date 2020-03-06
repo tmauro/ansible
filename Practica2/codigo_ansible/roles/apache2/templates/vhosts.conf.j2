@@ -1,0 +1,264 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{{ apache2_global_vhost_settings }}
+
+{# Set up VirtualHosts #}
+{% for vhost in (apache2_vhosts + (apache2_additional_vhosts | default([]))) %}
+<VirtualHost {{ apache2_listen_ip }}:{{ vhost.listen_port | default(apache2_listen_port) }}>
+  ServerName {{ vhost.servername | default(inventory_hostname) }}
+{# ServerAlias #}
+	{% if vhost.serveralias is defined %}
+  ServerAlias {{ vhost.serveralias }}
+	{% endif %}
+{# DirectoryIndex #}
+	{% if vhost.directoryindex is defined %}
+  DirectoryIndex {{ vhost.directoryindex }}
+	{% endif %}
+{# ServerAdmin #}
+	{% if vhost.serveradmin is defined %}
+  ServerAdmin {{ vhost.serveradmin }}
+	{% endif %}
+
+{# apache2_is_ssl #}
+	{% if vhost.is_ssl | default(False) %}
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+  	{% else %}
+{# ProxyPass #}
+		{% if vhost.proxy_pass_port is defined %}
+			{% if vhost.proxy_pass_extra is defined %}
+  {{ vhost.proxy_pass_extra }}
+			{% endif %}
+			{% if vhost.proxy_protocol is defined %}
+				{% if vhost.proxy is defined %}
+					{% for item in vhost.proxy %}
+  ProxyPass {{ item.url }} {{ vhost.proxy_protocol }}://{{ item.proxy_app }}:{{ vhost.proxy_pass_port }}/ retry=60
+  ProxyPassReverse {{ item.url }} {{ vhost.proxy_protocol }}://{{ item.proxy_app }}:{{ vhost.proxy_pass_port }}/
+					{% endfor %}
+				{% else %}
+  ProxyPass / {{ vhost.proxy_protocol }}://{{ vhost.proxy_app }}:{{ vhost.proxy_pass_port }}/ retry=60
+  ProxyPassReverse / {{ vhost.proxy_protocol }}://{{ vhost.proxy_app }}:{{ vhost.proxy_pass_port }}/
+				{% endif %}
+			{% else %}
+  ProxyPass / http://localhost:{{ vhost.proxy_pass_port }}/ retry=60
+  ProxyPassReverse / http://localhost:{{ vhost.proxy_pass_port }}/
+			{% endif %}
+  ProxyRequests Off
+  ProxyTimeout 9900
+			{% if vhost.proxy_keepalive is defined %}
+  KeepAliveTimeout {{ vhost.proxy_keepalive }}
+			{% else %}
+  KeepAliveTimeout 9900
+			{% endif %}
+  Timeout 9900
+		{% endif %}
+{# End ProxyPass #}
+
+{# mod_jk #}
+		{% if apache2_mod_jk_enabled %}
+			{% for nojk in vhost.mod_jk_nojks | default([]) %}
+  SetEnvIf Request_URI "{{ nojk }}" no-jk
+			{% endfor %}
+			{% if vhost.mod_jk_status | default(False) and apache2_mod_jk_status_enable %}
+  JkMount {{ apache2_mod_jk_status_url }} status
+			{% endif %}
+			{% for mount in vhost.mod_jk_mounts | default([]) %}
+  JkMount {{ mount.url }} {{ mount.loadbalancer }}
+			{% endfor %}
+			{% for unmount in vhost.mod_jk_unmounts | default([]) %}
+  JkUnMount {{ unmount.url }} {{ unmount.loadbalancer }}
+			{% endfor %}
+		{% endif %}
+{# End mod_jk #}
+	{% endif %}
+{# End of if apache2_is_ssl #}
+	{% if vhost.documentroot is defined %}
+  DocumentRoot {{ vhost.documentroot }}
+
+  <Directory "{{ vhost.documentroot }}">
+    AllowOverride All
+    Options -Indexes +FollowSymLinks
+    Require all granted
+  </Directory>
+	{% endif %}
+
+	{% if vhost.location is defined %}
+  <Location {{ vhost.location }}>
+    {{ vhost.location_content | default('') }}
+  </Location>
+	{% endif %}
+
+  AddDefaultCharset off
+
+  Loglevel {{ vhost.loglevel | default('warn') }}
+  ErrorLog {{ vhost.error_log | default(apache2_log_dir + '/' + apache2_error_log) }}
+  CustomLog {{ vhost.access_log | default(apache2_log_dir + '/' + apache2_access_log) }} combined
+
+	{% if vhost.extra_parameters is defined %}
+  {{ vhost.extra_parameters }}
+	{% endif %}
+</VirtualHost>
+
+{% endfor %}
+{# End of for apache2_vhosts #}
+
+{# Set up SSL VirtualHosts #}
+{% for vhost in (apache2_vhosts_ssl + (apache2_additional_vhosts_ssl | default([]))) %}
+<VirtualHost {{ apache2_listen_ip }}:{{ vhost.listen_port | default(apache2_listen_port_ssl) }}>
+  ServerName {{ vhost.servername | default(inventory_hostname) }}
+	{% if vhost.serveralias is defined %}
+  ServerAlias {{ vhost.serveralias }}
+	{% endif %}
+	{% if vhost.directoryindex is defined %}
+  DirectoryIndex {{ vhost.directoryindex }}
+	{% endif %}
+	{% if vhost.serveradmin is defined %}
+  ServerAdmin {{ vhost.serveradmin }}
+	{% endif %}
+
+	{% for aliasmatch in vhost.aliasmatches | default([]) %}
+  AliasMatch {{ aliasmatch }}
+	{% endfor %}
+
+  SSLEngine on
+  SSLCipherSuite {{ vhost.cipher_suite }}
+  SSLProtocol {{ vhost.protocol }}
+  SSLHonorCipherOrder On
+  SSLCompression off
+  SSLCertificateFile {{ apache2_ssl_cert_dir }}/{{ vhost.certificate_file_path }}.pem
+  SSLCertificateKeyFile {{ apache2_ssl_privkey_dir }}/{{ vhost.certificate_key_file_path }}.key
+	{% if vhost.certificate_ca_file_path is defined %}
+  SSLCertificateChainFile {{ apache2_ssl_cert_dir }}/{{ vhost.certificate_ca_file_path }}.pem
+	{% elif vhost.certificate_chain_file_path is defined %}
+  SSLCertificateChainFile {{ apache2_ssl_cert_dir }}/{{ vhost.certificate_chain_file_path }}-chain.pem
+	{% endif %}
+
+	{% if vhost.previous_extra_parameters is defined %}
+  {{ vhost.previous_extra_parameters }}
+	{% endif %}
+
+{# ProxyPass #}
+	{% if vhost.proxy_pass_port is defined %}
+		{% if vhost.proxy_pass_extra is defined %}
+  {{ vhost.proxy_pass_extra }}
+		{% endif %}
+		{% if vhost.proxy_pass_match is defined %}
+  ProxyPassMatch {{ vhost.proxy_pass_match }}
+		{% endif %}
+		{% if vhost.proxy_pass_error is defined %}
+  ProxyPass {{ vhost.proxy_pass_error }}
+		{% endif %}
+		{% if vhost.proxy_protocol is defined %}
+			{% if vhost.proxy is defined %}
+				{% for item in vhost.proxy %}
+  ProxyPass {{ item.url }} {{ vhost.proxy_protocol }}://{{ item.proxy_app }}:{{ vhost.proxy_pass_port }}/ retry=60
+  ProxyPassReverse {{ item.url }} {{ vhost.proxy_protocol }}://{{ item.proxy_app }}:{{ vhost.proxy_pass_port }}/
+				{% endfor %}
+			{% else %}
+  ProxyPass / {{ vhost.proxy_protocol }}://{{ vhost.proxy_app }}:{{ vhost.proxy_pass_port }}/ retry=60
+  ProxyPassReverse / {{ vhost.proxy_protocol }}://{{ vhost.proxy_app }}:{{ vhost.proxy_pass_port }}/
+			{% endif %}
+		{% else %}
+  ProxyPass / http://localhost:{{ vhost.proxy_pass_port }}/ retry=60
+  ProxyPassReverse / http://localhost:{{ vhost.proxy_pass_port }}/
+		{% endif %}
+
+  ProxyRequests Off
+  ProxyTimeout 9900
+		{% if vhost.proxy_keepalive is defined %}
+  KeepAliveTimeout {{ vhost.proxy_keepalive }}
+		{% else %}
+  KeepAliveTimeout 9900
+		{% endif %}
+  Timeout 9900
+	{% endif %}
+{# End ProxyPass #}
+
+{# mod_jk #}
+	{% if apache2_mod_jk_enabled %}
+		{% for nojk in vhost.mod_jk_nojks | default([]) %}
+  SetEnvIf Request_URI "{{ nojk }}" no-jk
+		{% endfor %}
+		{% if vhost.mod_jk_status | default(False) and apache2_mod_jk_status_enable %}
+  JkMount {{ apache2_mod_jk_status_url }} status
+		{% endif %}
+		{% for mount in vhost.mod_jk_mounts | default([]) %}
+  JkMount {{ mount.url }} {{ mount.loadbalancer }}
+		{% endfor %}
+		{% for unmount in vhost.mod_jk_unmounts | default([]) %}
+  JkUnMount {{ unmount.url }} {{ unmount.loadbalancer }}
+		{% endfor %}
+	{% endif %}
+{# End mod_jk #}
+
+	{% if vhost.documentroot is defined %}
+  DocumentRoot {{ vhost.documentroot }}
+  
+  <Directory "{{ vhost.documentroot }}">
+    AllowOverride All
+    Options -Indexes +FollowSymLinks
+    Require all granted
+  </Directory>
+	{% endif %}
+
+	{% if vhost.location is defined %}
+  <Location {{ vhost.location }}>
+{{ vhost.location_content | default('') }}
+  </Location>
+	{% endif %}
+
+	{% if vhost.location_extra is defined %}
+  {{ vhost.location_extra }}
+	{% endif %}
+
+  AddDefaultCharset off
+  Loglevel {{ vhost.loglevel | default('warn') }}
+  ErrorLog {{ vhost.error_log | default(apache2_log_dir + '/' + apache2_ssl_error_log) }}
+  CustomLog {{ vhost.access_log | default(apache2_log_dir + '/' + apache2_ssl_access_log) }} combined
+
+	{% if vhost.extra_parameters is defined %}
+  {{ vhost.extra_parameters }}
+	{% endif %}
+</VirtualHost>
+{% endfor %}
+{# End of for apache2_vhosts_ssl #}
+
+{# mod_proxy #}
+		{% if apache2_mod_proxy_balancer_enabled %}
+			{% if apache2_mod_proxy_balancer is defined %}
+				{% for balancer in apache2_mod_proxy_balancer %}
+  <Proxy balancer://{{ balancer.name }}>
+						{% for node in balancer.config %}
+    BalancerMember {{ node.protocol }}://{{ node.ip }}:{{ node.port }} route={{ node.name }} loadfactor=1 keepalive=On
+						{% endfor %}
+	ProxySet {{ balancer.options }}
+  </Proxy>
+  				{% endfor %}
+			{% endif %}
+
+  ProxyRequests	Off
+  ProxyPreserveHost On   
+  
+  ProxyPass /balancer-manager !
+  ProxyPassMatch ^/static\d*/(.*)$ !
+			{% for proxypass in apache2_mod_proxy_proxypass %}
+  ProxyPass {{ proxypass.name }} "{{ proxypass.umount }}"
+  ProxyPassReverse {{ proxypass.name }} "{{ proxypass.umount }}"
+  			{% endfor %}
+
+			{% for balancer in apache2_mod_proxy_balancer %}
+				{% if balancer.urlmatch is defined %}
+  ProxyPass               {{ balancer.urlmatch }}	   "balancer://{{ balancer.name }}/"
+  ProxyPassReverse        {{ balancer.urlmatch }}      "balancer://{{ balancer.name }}/"
+				{% endif %}
+			{% endfor %}
+
+  <Location "/balancer-manager">
+    SetHandler balancer-manager
+		{% if apache2_mod_proxy_access is defined %}
+    SetEnvIf X-Forwarded-For {{ apache2_mod_proxy_access }}$ smk
+    Require env smk
+	  	{% endif %}
+  </Location>
+		{% endif %}
+{# End mod_proxy #}

@@ -1,0 +1,13 @@
+---
+# vars file for apache2
+
+apache2_default_vhost: 000-default.conf
+apache2_ports_configuration_items:
+  - {
+    regexp: "^Listen ",
+    line: "Listen {{ apache2_listen_port }}"
+  }
+
+apache2_mod_jk_conf_path: "{{ apache2_conf_path }}/mod_jk.d/"
+
+apache2_mod_limitipconn_download_url: https://dominia.org/djao/limit/mod_limitipconn-{{ apache2_mod_limitipconn_version }}.tar.bz2

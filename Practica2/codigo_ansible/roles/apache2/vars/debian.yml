@@ -1,0 +1,32 @@
+apache2_packages:
+  - apache2
+  - apache2-utils
+
+apache2_devel_packages:
+  - apache2-dev
+  - gcc
+  - make
+
+apache2_service: apache2
+
+apache2_ssl_cert_dir: /etc/ssl/certs
+apache2_ssl_privkey_dir: /etc/ssl/private
+
+apache2_daemon: apache2
+apache2_daemon_path: /usr/sbin/
+
+apache2_conf_path: /etc/apache2
+apache2_conf_file: apache2.conf
+apache2_ports_conf_file: ports.conf
+apache2_conf_d_path: "{{ apache2_conf_path }}/conf-enabled"
+
+apache2_default_vhost_filename: sites-enabled/{{ apache2_default_vhost }}
+
+apache2_log_dir: /var/log/apache2
+apache2_access_log: access.log
+apache2_ssl_access_log: ssl_access.log
+apache2_error_log: error.log
+apache2_ssl_error_log: ssl_error.log
+apache2_mod_jk_error_log: mod_jk_error.log
+
+apache2_mod_jk_conf_file: /etc/apache2/mods-available/jk.conf

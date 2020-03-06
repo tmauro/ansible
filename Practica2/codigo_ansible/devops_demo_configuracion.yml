@@ -1,0 +1,29 @@
+---
+# Playbook para demo Ansible
+#
+#
+
+# Play para la gestión de la configuración.
+- name: Play para modificar fichero /etc/hosts
+  hosts: devops0.local
+  user: vagrant
+  become: true
+  vars:
+    linea_etc_hosts: "{{ ansible_eth1.ipv4.address }} {{ ansible_fqdn }}"
+
+  tasks:
+# Esta tarea añade una linea al fichero hosts con el nombre de la máquina y su ip
+    - name: Configuración fichero /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ linea_etc_hosts }}"
+
+    - name: Comprueba el fichero /etc/hosts
+      command: cat /etc/hosts
+      register: cat_fichero_hosts
+
+    - debug:
+        msg: "{{ cat_fichero_hosts }}"
+
+
+...

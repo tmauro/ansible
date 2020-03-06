@@ -1,0 +1,57 @@
+- name: Autoindex
+  lineinfile:
+    dest: "{{ apache2_conf_path }}/conf.d/autoindex.conf"
+    regexp: '{{ item.key}} {{ item.value }}'
+    line: '{{ item.key }} {{ item.value }}'
+    state: present
+  with_items: "{{ apache2_autoindex_conf }}"
+  notify: restart apache2
+  when: ansible_os_family == "RedHat" and apache2_modsecurity_enable
+  tags: ["config"]
+
+- name: Autoindex LocationMatch
+  blockinfile:
+    dest: "{{ apache2_conf_path }}/conf.d/autoindex.conf"
+    regexp: '^#?\s*{{ item.name }}\s* .*$'
+    block: |
+        <LocationMatch {{ item.name }}>
+          {% for item in item.content %}
+            {{ item }}
+          {% endfor %}
+        </LocationMatch>
+    state: present
+  with_items: "{{ apache2_autoindex_location }}"
+  notify: restart apache2
+  when: ansible_os_family == "RedHat" and apache2_modsecurity_enable
+  tags: ["config"]
+
+- name: Configurar reglas locales de modsecurity
+  template:
+    src: localrules.j2
+    dest: "{{ apache2_modsecurity_rules_dir }}/modsecurity_localrules.conf"
+  when: ansible_os_family == "RedHat"
+  tags: ["config"]
+
+- name: Modsecurity | Configuración
+  lineinfile:
+    dest: "{{ apache2_conf_path }}/conf.d/mod_security.conf"
+    regexp: '^#?\s*{{ item.key }}\s* .*$'
+    line: '    {{ item.key }} {{ item.value }}'
+    insertbefore: '</IfModule>'
+    state: present
+  with_items: "{{ apache2_modsecurity_config }}"
+  notify: restart apache2
+  when: ansible_os_family == "RedHat"
+  tags: ["config"]
+
+- name: Modsecurity | Deshabilitar reglas
+  lineinfile:
+    dest: "{{ apache2_conf_path }}/conf.d/mod_security.conf"
+    regexp: '^#?\s*{{ item.key}} {{ item.value }}\s'
+    line: '    {{ item.key }} {{ item.value }}'
+    insertbefore: '</IfModule>'
+    state: present
+  with_items: "{{ apache2_modsecurity_disabledrules }}"
+  notify: restart apache2
+  when: ansible_os_family == "RedHat"
+  tags: ["config"]

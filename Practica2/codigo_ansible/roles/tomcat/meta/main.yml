@@ -1,0 +1,16 @@
+galaxy_info:
+  author: DevOps Ceridia
+  description: Instalación Tomcat 8
+  company: Xeridia
+  version: 1.7.4
+  license: license (GPLv2, CC-BY, etc)
+  min_ansible_version: 2.4
+  platforms:
+    - name: EL
+      versions:
+        - 7
+
+  categories: []
+
+dependencies:
+  - ansible_java

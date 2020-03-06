@@ -1,0 +1,156 @@
+---
+# tasks file for apache2
+
+- name: Variables Debian
+  include_vars: debian.yml
+  when: ansible_os_family == "Debian"
+  tags: ["config"]
+
+- name: Variables RedHat
+  include_vars: redhat.yml
+  when: ansible_os_family == "RedHat"
+  tags: ["config"]
+
+- name: Instalar paquetes
+  package:
+    name: "{{ item.1 }}"
+    state: present
+  with_indexed_items: "{{ apache2_packages + apache2_additional_packages }}"
+  tags: ["install"]
+
+- name: Iniciar y habilitar servicio
+  service:
+    name: "{{ apache2_service }}"
+    enabled: yes
+    state: started
+  tags: ["install"]
+
+- name: Configurar Apache
+  lineinfile:
+    dest: "{{ apache2_conf_path }}/{{ apache2_conf_file }}"
+    regexp: '^{{ item.option}}\s.*$'
+    line: '{{ item.option }} {{ item.value }}'
+    state: present
+  with_items: "{{ apache2_configuration_items }}"
+  notify: restart apache2
+  when: apache2_configuration_items is defined
+  tags: ["config"]
+
+- name: Configurar Apache | ErrorDocuments
+  lineinfile:
+    dest: "{{ apache2_conf_path }}/{{ apache2_conf_file }}"
+    regexp: '^{{ item.option}} {{ item.value }}\s.*$'
+    line: '{{ item.option }} {{ item.value }}'
+    state: present
+  with_items: "{{ apache2_error_doc_items }}"
+  notify: restart apache2
+  when: apache2_error_doc_items is defined
+  tags: ["config"]
+
+- name: Configurar puertos Apache
+  lineinfile:
+    dest: "{{ apache2_conf_path }}/{{ apache2_ports_conf_file }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items: "{{ apache2_ports_configuration_items }}"
+  notify: restart apache2
+  when: apache2_ports_configuration_items is defined
+  tags: ["config"]
+
+- name: Habilitar modulos Debian
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache2_debian_mods_enabled }}"
+  notify: restart apache2
+  when: ansible_os_family == "Debian" and apache2_debian_mods_enabled is defined
+  tags: ["config"]
+
+- name: Deshabilitar modulos Debian
+  apache2_module:
+    name: "{{ item }}"
+    state: absent
+  with_items: "{{ apache2_debian_mods_disabled }}"
+  notify: restart apache2
+  when: ansible_os_family == "Debian" and apache2_debian_mods_disabled is defined
+  tags: ["config"]
+
+- name: Certificados y claves privadas
+  copy:
+    content: "{{ item.crt }}"
+    dest: "{{ item.is_key | default(False) | ternary(apache2_ssl_privkey_dir, apache2_ssl_cert_dir) }}/{{ item.filename }}{{ item.is_key | default(False) | ternary('.key', item.is_ca | default(False) | ternary('-chain.pem', '.pem')) }}"
+    mode: 0644
+    owner: root
+    group: root
+  with_items: "{{ apache2_ssl_certificates }}"
+  when: apache2_ssl_certificates is defined
+  no_log: "{{ no_log_var }}"
+  tags: ["install"]
+
+- name: Vhosts Debian
+  template:
+    src: "vhosts.conf.j2"
+    dest: "{{ apache2_conf_path }}/sites-available/{{ apache2_vhosts_filename }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache2
+  when: ansible_os_family == "Debian" and (apache2_create_vhosts | default(False))
+  tags: ["config"]
+
+- name: Vhosts Debian habilitado
+  file:
+    src: "{{ apache2_conf_path }}/sites-available/{{ apache2_vhosts_filename }}"
+    dest: "{{ apache2_conf_path }}/sites-enabled/{{ apache2_vhosts_filename }}"
+    state: link
+  notify: restart apache2
+  when: ansible_os_family == "Debian" and (apache2_create_vhosts | default(False))
+  tags: ["config"]
+
+- name: Vhosts RedHat
+  template:
+    src: "vhosts.conf.j2"
+    dest: "{{ apache2_conf_path }}/conf.d/{{ apache2_vhosts_filename }}"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart apache2
+  when: ansible_os_family == "RedHat" and (apache2_create_vhosts | default(False))
+  tags: ["config"]
+
+- name: Eliminar el Vhost por defecto
+  file:
+    path: "{{ apache2_conf_path }}/{{ apache2_default_vhost_filename }}"
+    state: absent
+  notify: restart apache2
+  when: apache2_remove_default_vhost | default(False)
+  tags: ["config"]
+
+# MODULOS APACHE
+# modsecurity
+- name:  WAPPSERVERS
+  include: modsecurity.yml
+  when: apache2_modsecurity_enable
+
+# mod_jk
+- name:  WAPPSERVERS
+  include: mod_jk.yml
+  when: apache2_mod_jk_enabled
+
+# mod_limitipconn
+- name: mod_limitipconn | Instalación
+  include: mod_limitipconn.yml
+  when: apache2_mod_limitipconn_enabled
+
+- name: mod_limitipconn | Archivo de configuración
+  blockinfile:
+    dest: "{{ apache2_conf_path }}/{{ apache2_conf_file }}"
+    insertafter: 'limitipconn_module'
+    marker: '## {mark} LimitIPConn'
+    block: |
+      {{ apache2_mod_limitipconn_config }}
+  no_log: "{{ no_log_var }}"
+  notify: restart apache2
+  when: apache2_mod_limitipconn_enabled
+  tags: ["configure"]
